@@ -8,9 +8,9 @@ namespace API.Controllers
     public class ProductsController(IProductRepository productRepository) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts()
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] string? brand,string? type,string? sort)
         {
-            IReadOnlyList<Product> products = await productRepository.GetProductsAsync();
+            IReadOnlyList<Product> products = await productRepository.GetProductsAsync(brand,type,sort);
             return products.Count == 0 ? NotFound() : Ok(products);
         }
         [HttpGet("{id:int}")]
@@ -18,6 +18,22 @@ namespace API.Controllers
         {
             Product? product = await productRepository.GetProductByIdAsync(id);
             return product == null ? NotFound() : Ok(product);
+        }
+        [HttpGet("brands")]
+        public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
+        {
+            if (await productRepository.IsTableEmpty())
+                return BadRequest("The table appears to be empty!");
+            IReadOnlyList<string> brands = await productRepository.GetProductBrands();    
+            return Ok(brands);
+        }
+        [HttpGet("types")]
+        public async Task<ActionResult<IReadOnlyList<string>>>GetProductTypes()
+        {
+            if (await productRepository.IsTableEmpty())
+                return NoContent();
+            IReadOnlyList<string> types = await productRepository.GetProductTypes();    
+            return Ok(types);
         }
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
