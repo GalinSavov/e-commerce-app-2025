@@ -16,5 +16,19 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline
 app.MapControllers();
-
+try
+{
+    //apply any pending ef migrations
+    using var scope = app.Services.CreateScope(); //scope that is disposed of after it finishes executing
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<StoreContext>();
+    await context.Database.MigrateAsync();
+    //seed data from a JSON file after applying pending migrations
+    await StoreContextSeed.SeedAsync(context);
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex);
+    throw;
+}
 app.Run();
