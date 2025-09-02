@@ -1,6 +1,8 @@
 using Core.Entities;
 using Core.Interfaces;
+using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualBasic;
 namespace API.Controllers
 {
     [ApiController]
@@ -8,13 +10,14 @@ namespace API.Controllers
     public class ProductsController(IGenericRepository<Product> repository) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] string? brand,string? type,string? sort)
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
         {
-            IReadOnlyList<Product> products = await repository.GetAllAsync();
-            return products.Count == 0 ? NotFound() : Ok(products);
+            var specification = new ProductSpecification(brand, type,sort);
+            var products = await repository.GetAllAsync(specification);
+            return products == null ? NotFound() : Ok(products);
         }
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+          public async Task<ActionResult<Product>> GetProduct(int id)
         {
             Product? product = await repository.GetByIdAsync(id);
             return product == null ? NotFound() : Ok(product);
@@ -23,13 +26,16 @@ namespace API.Controllers
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
             //ToDO:
-            return Ok();
+            var specification = new BrandListSpecification();
+            var brands = await repository.GetAllAsync<string>(specification);
+            return brands == null ? NotFound() : Ok(brands);
         }
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>>GetProductTypes()
         {
-            //ToDO:  
-            return Ok();
+            var specification = new TypeListSpecification();
+            var types = await repository.GetAllAsync<string>(specification);
+            return types == null ? NotFound() : Ok(types);
         }
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
