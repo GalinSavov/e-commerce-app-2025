@@ -10,9 +10,9 @@ namespace API.Controllers
     public class ProductsController(IGenericRepository<Product> repository) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts(string? brand, string? type, string? sort)
+        public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery]ProductSpecParams productParams)
         {
-            var specification = new ProductSpecification(brand, type,sort);
+            var specification = new ProductSpecification(productParams);
             var products = await repository.GetAllAsync(specification);
             return products == null ? NotFound() : Ok(products);
         }
