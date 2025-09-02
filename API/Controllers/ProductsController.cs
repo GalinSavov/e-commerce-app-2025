@@ -17,7 +17,7 @@ namespace API.Controllers
             return products == null ? NotFound() : Ok(products);
         }
         [HttpGet("{id:int}")]
-          public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
             Product? product = await repository.GetByIdAsync(id);
             return product == null ? NotFound() : Ok(product);
@@ -25,7 +25,6 @@ namespace API.Controllers
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
-            //ToDO:
             var specification = new BrandListSpecification();
             var brands = await repository.GetAllAsync<string>(specification);
             return brands == null ? NotFound() : Ok(brands);

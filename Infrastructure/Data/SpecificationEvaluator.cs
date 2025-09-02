@@ -6,6 +6,7 @@ namespace Infrastructure.Data;
 
 public class SpecificationEvaluator<T> where T : BaseEntity
 {
+    //entity query
     public static IQueryable<T> Evaluate(IQueryable<T> query, ISpecification<T> specification)
     {
         if (specification.Criteria != null)
@@ -26,6 +27,7 @@ public class SpecificationEvaluator<T> where T : BaseEntity
         }
         return query;
     }
+    //projection query
     public static IQueryable<TResult> Evaluate<TSpec, TResult>(IQueryable<T> query, ISpecification<T, TResult> specification)
     {
         if (specification.Criteria != null)
