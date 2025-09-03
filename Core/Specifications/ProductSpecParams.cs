@@ -4,6 +4,18 @@ namespace Core.Specifications;
 
 public class ProductSpecParams
 {
+    #region Pagination Params
+    private const int MaxPageSize = 50;
+    public int PageIndex { get; set; } = 1;
+    private int _pageSize = 6;
+    public int PageSize
+    {
+        get => _pageSize;
+        set => _pageSize = (value > MaxPageSize) ? MaxPageSize : value;
+    }
+    #endregion
+
+    #region Filtering Params
     private List<string> _brands = [];
     private List<string> _types = [];
     public List<string> Types
@@ -23,4 +35,12 @@ public class ProductSpecParams
         }
     }
     public string? Sort { get; set; }
+    #endregion
+    private string? _search;
+    public string Search
+    {
+        get => _search ?? "";
+        set => _search = value.ToLower();
+    }
+    
 }
