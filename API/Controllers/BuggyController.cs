@@ -1,5 +1,4 @@
-using Core.Entities;
-using Microsoft.AspNetCore.Http;
+using API.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -29,7 +28,7 @@ namespace API.Controllers
             throw new Exception("This is a test exception");
         }
         [HttpPost("validationerror")]
-        public IActionResult GetValidationError(Product product)
+        public IActionResult GetValidationError(ProductDTO product)
         {
             return Ok();
         }
