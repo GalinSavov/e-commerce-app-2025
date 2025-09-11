@@ -1,8 +1,12 @@
 <div class="flex flex-col gap-3">
-    <div class="flex justify-end">
+    <div class="flex justify-end gap-3">
         <button mat-stroked-button (click)="openFiltersDialog()">
             <mat-icon>filter_list</mat-icon>
             Filters
+        </button>
+        <button mat-stroked-button [mat-menu-trigger-for]="sortMenu">
+            <mat-icon>swap_vert</mat-icon>
+            Sort By
         </button>
     </div>
     <div class="grid grid-cols-5 gap-5">
@@ -11,4 +15,11 @@
     }
     </div>
 </div>
+<mat-menu #sortMenu="matMenu">
+    <mat-selection-list [multiple]="false" (selectionChange)="onSortChange($event)">
+        @for (option of sortingOptions; track $index) {
+            <mat-list-option  [value]="option.value" [selected]="selectedSorting === option.value">{{option.name}}</mat-list-option>
+        }
+    </mat-selection-list>
+</mat-menu>
 

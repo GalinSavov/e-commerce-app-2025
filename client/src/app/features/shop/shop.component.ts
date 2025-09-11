@@ -6,10 +6,12 @@ import {MatDialog} from '@angular/material/dialog';
 import { FiltersDialogComponent } from './filters-dialog/filters-dialog.component';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
+import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent,MatButton,MatIcon],
+  imports: [ProductItemComponent,MatButton,MatIcon,MatMenu,MatSelectionList,MatListOption,MatMenuTrigger],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
@@ -19,6 +21,12 @@ export class ShopComponent implements OnInit {
   protected products: Product[] = [];
   protected selectedBrands: string[] = [];
   protected selectedTypes: string[] = [];
+  protected selectedSorting: string = 'name';
+  protected sortingOptions = [
+    {name: 'A-Z', value:'name'},
+    {name: 'Price: Low-High', value:'priceAsc'},
+    {name: 'Price: High-Low', value:'priceDesc'},
+  ]
   ngOnInit(): void 
   {
     this.getProducts();
@@ -26,7 +34,7 @@ export class ShopComponent implements OnInit {
     this.getProductTypes();
   }
   getProducts(){
-    this.shopService.getProducts().subscribe({
+    this.shopService.getProducts(this.selectedBrands,this.selectedTypes,this.selectedSorting).subscribe({
       next: response => this.products = response.data,
       error: error => console.log(error),
     });
@@ -50,12 +58,16 @@ export class ShopComponent implements OnInit {
         if(response){
           this.selectedBrands = response.selectedBrands;
           this.selectedTypes = response.selectedTypes;
-          this.shopService.getProducts(this.selectedBrands,this.selectedTypes).subscribe({
-              next: response => this.products = response.data,
-              error: error => console.log(error),
-          })
+          this.getProducts();
         } 
       }
     })
+  }
+  onSortChange(event: MatSelectionListChange){
+    const selectedOption = event.options[0];
+    if(selectedOption){
+      this.selectedSorting = selectedOption.value;
+      this.getProducts();
+    }
   }
 }
