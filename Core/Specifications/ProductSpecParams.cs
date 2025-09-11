@@ -1,5 +1,3 @@
-using System;
-
 namespace Core.Specifications;
 
 public class ProductSpecParams
@@ -20,10 +18,10 @@ public class ProductSpecParams
     private List<string> _types = [];
     public List<string> Types
     {
-        get { return _types; }
+        get => _types;
         set
         {
-            _types = value.SelectMany(x => x.Split('x', StringSplitOptions.RemoveEmptyEntries)).ToList();
+            _types = value.SelectMany(x => x.Split(',', StringSplitOptions.RemoveEmptyEntries)).ToList();
         }
     }
     public List<string> Brands
