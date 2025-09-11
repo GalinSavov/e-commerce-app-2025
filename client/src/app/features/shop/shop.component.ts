@@ -8,24 +8,29 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import {MatMenu, MatMenuTrigger} from '@angular/material/menu';
 import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
+import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import { ShopParams } from '../../shared/models/shopParams';
+import { Pagination } from '../../shared/models/pagination';
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent,MatButton,MatIcon,MatMenu,MatSelectionList,MatListOption,MatMenuTrigger],
+  imports: [ProductItemComponent,MatButton,MatIcon,MatMenu,MatSelectionList,MatListOption,MatMenuTrigger,MatPaginator],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
 export class ShopComponent implements OnInit {
   private readonly shopService = inject(ShopService);
   private matDialogService = inject(MatDialog)
-  protected products: Product[] = [];
+  protected products?: Pagination<Product>;
   protected sortingOptions = [
     {name: 'A-Z', value:'name'},
     {name: 'Price: Low-High', value:'priceAsc'},
     {name: 'Price: High-Low', value:'priceDesc'},
   ]
   protected shopParams = new ShopParams();
+  protected pageSizeOptions = [
+    5,10,15,20
+  ]
   ngOnInit(): void 
   {
     this.getProducts();
@@ -34,7 +39,7 @@ export class ShopComponent implements OnInit {
   }
   getProducts(){
     this.shopService.getProducts(this.shopParams).subscribe({
-      next: response => this.products = response.data,
+      next: response => this.products = response,
       error: error => console.log(error),
     });
   }
@@ -57,6 +62,7 @@ export class ShopComponent implements OnInit {
         if(response){
           this.shopParams.brands = response.selectedBrands;
           this.shopParams.types = response.selectedTypes;
+          this.shopParams.pageNumber = 1;
           this.getProducts();
         } 
       }
@@ -66,7 +72,13 @@ export class ShopComponent implements OnInit {
     const selectedOption = event.options[0];
     if(selectedOption){
       this.shopParams.sort = selectedOption.value;
+      this.shopParams.pageNumber = 1;
       this.getProducts();
     }
+  }
+  handlePage(event: PageEvent){
+    this.shopParams.pageNumber = event.pageIndex + 1;
+    this.shopParams.pageSize = event.pageSize;
+    this.getProducts();
   }
 }
