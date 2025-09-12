@@ -11,10 +11,12 @@ import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angula
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import { ShopParams } from '../../shared/models/shopParams';
 import { Pagination } from '../../shared/models/pagination';
+import { FormsModule } from '@angular/forms';
+import { MatIconButton } from "@angular/material/button";
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent,MatButton,MatIcon,MatMenu,MatSelectionList,MatListOption,MatMenuTrigger,MatPaginator],
+  imports: [ProductItemComponent, MatButton, MatIcon, MatMenu, MatSelectionList, MatListOption, MatMenuTrigger, MatPaginator, FormsModule, MatIconButton],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
@@ -76,9 +78,13 @@ export class ShopComponent implements OnInit {
       this.getProducts();
     }
   }
-  handlePage(event: PageEvent){
+  onPageChange(event: PageEvent){
     this.shopParams.pageNumber = event.pageIndex + 1;
     this.shopParams.pageSize = event.pageSize;
+    this.getProducts();
+  }
+  onSearchChange(){
+    this.shopParams.pageNumber = 1;
     this.getProducts();
   }
 }

@@ -32,3 +32,7 @@ body {
   // Reset the user agent margin.
   margin: 0;
 }
+
+.match-input-height{
+  height: var(--mat-form-field-container-height) !important;
+}
