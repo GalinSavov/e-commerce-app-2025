@@ -24,6 +24,7 @@ export class ShopComponent implements OnInit {
   private readonly shopService = inject(ShopService);
   private matDialogService = inject(MatDialog)
   protected products?: Pagination<Product>;
+  protected currentProduct?: Product;
   protected sortingOptions = [
     {name: 'A-Z', value:'name'},
     {name: 'Price: Low-High', value:'priceAsc'},
@@ -51,6 +52,7 @@ export class ShopComponent implements OnInit {
   getProductTypes(){
     this.shopService.getProductTypes();
   }
+  
   openFiltersDialog(){
     const dialogRef = this.matDialogService.open(FiltersDialogComponent,{
       minWidth:'500px',
