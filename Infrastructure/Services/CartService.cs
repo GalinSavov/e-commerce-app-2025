@@ -9,14 +9,14 @@ namespace Infrastructure.Services;
 public class CartService(IConnectionMultiplexer redis) : ICartService
 {
     private readonly IDatabase _database = redis.GetDatabase();
-    public async Task<bool> DeleteCartAsync(string id)
+    public async Task<bool> DeleteCartAsync(string key)
     {
-        return await _database.KeyDeleteAsync(id);
+        return await _database.KeyDeleteAsync(key);
     }
 
-    public async Task<ShoppingCart?> GetCartAsync(string id)
+    public async Task<ShoppingCart?> GetCartAsync(string key)
     {
-        var data = await _database.StringGetAsync(id);
+        var data = await _database.StringGetAsync(key);
         return data.IsNullOrEmpty ? null : JsonSerializer.Deserialize<ShoppingCart>(data!);
     }
 

@@ -4,7 +4,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/redis
+      - redis-data:/data
 volumes:
   redis-data:      
       
