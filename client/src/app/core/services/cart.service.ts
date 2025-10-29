@@ -4,6 +4,7 @@ import { createNewCart, ShoppingCart } from '../../shared/models/shoppingCart';
 import { HttpClient } from '@angular/common/http';
 import { CartItem } from '../../shared/models/cartItem';
 import { Product } from '../../shared/models/product';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,9 +14,12 @@ export class CartService {
   shoppingCart = signal<ShoppingCart | null>(null)
   private http = inject(HttpClient);
   getCart(id:string){
-    return this.http.get<ShoppingCart>(this.apiURL + 'cart?id='+ id).subscribe({
-      next: response => this.shoppingCart.set(response)
-    })
+    return this.http.get<ShoppingCart>(this.apiURL + 'cart?id='+ id).pipe(
+      map(cart => {
+        this.shoppingCart.set(cart);
+        return cart;
+      })
+    )
   }
   deleteCart(id:string){
     return this.http.delete(this.apiURL+ 'cart?id=' + id)
@@ -31,7 +35,7 @@ export class CartService {
       item = this.mapProductToCartItem(item);
     }
     cart.items = this.addOrUpdateItem(cart.items,item,quantity);
-    this.shoppingCart.set(cart);
+    this.setCart(cart);
   }
   private addOrUpdateItem(items: CartItem[], item: CartItem, quantity: number): CartItem[] {
     const index = items.findIndex(x=>x.productId === item.productId)

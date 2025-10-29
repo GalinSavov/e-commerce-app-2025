@@ -6,7 +6,6 @@ import { CurrencyPipe } from '@angular/common';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from "@angular/material/icon";
 import { RouterLink } from '@angular/router';
-import { CartItem } from '../../shared/models/cartItem';
 import { CartService } from '../../core/services/cart.service';
 
 @Component({
