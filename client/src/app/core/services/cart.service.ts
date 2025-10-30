@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment.development';
 import { createNewCart, ShoppingCart } from '../../shared/models/shoppingCart';
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +12,9 @@ import { map } from 'rxjs';
 export class CartService {
   apiURL = environment.apiURL;
   shoppingCart = signal<ShoppingCart | null>(null)
+  itemCount = computed(() => {
+    return this.shoppingCart()?.items.reduce((sum,item) => sum + item.quantity,0)
+  });
   private http = inject(HttpClient);
   getCart(id:string){
     return this.http.get<ShoppingCart>(this.apiURL + 'cart?id='+ id).pipe(
