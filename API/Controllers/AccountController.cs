@@ -23,7 +23,14 @@ public class AccountController(SignInManager<AppUser> signInManager):BaseApiCont
             UserName = registerDTO.Email
         };
         var result = await signInManager.UserManager.CreateAsync(user, registerDTO.Password);
-        if (!result.Succeeded) return BadRequest(result.Errors);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem();
+        } 
         return Ok();
     }
     [Authorize]
