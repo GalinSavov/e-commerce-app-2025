@@ -1,5 +1,6 @@
 using Core.Entities;
 using Infrastructure.Config;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
@@ -8,7 +9,7 @@ namespace Infrastructure.Data;
 /// Custom DbContext that will manage and interact with the SQL database
 /// </summary>
 /// <param name="options"></param>
-public class StoreContext(DbContextOptions options) : DbContext(options)
+public class StoreContext(DbContextOptions options) : IdentityDbContext<AppUser>(options)
 {
     public DbSet<Product> Products { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
