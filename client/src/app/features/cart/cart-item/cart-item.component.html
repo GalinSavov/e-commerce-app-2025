@@ -5,11 +5,11 @@
         </a>
         <div class="flex items-center justify-between order-3">
             <div class="flex items-center align-middle gap-3">
-                <button mat-icon-button>
+                <button mat-icon-button (click)="decrementItemQuantity()">
                     <mat-icon class="text-red-600">remove</mat-icon>
                 </button>
                 <div class="font-semibold text-xl mb-1">{{item().quantity}}</div>
-                <button mat-icon-button>
+                <button mat-icon-button (click)="incrementItemQuantity()">
                     <mat-icon class="text-green-600">add</mat-icon>
                 </button>
             </div>
@@ -22,7 +22,7 @@
                 {{item().productName}}
             </a>
             <div class="flex items-center gap-4">
-                <button mat-button class="text-red-600">
+                <button mat-button class="text-red-600" (click)="removeItemFromCart()">
                     <mat-icon>delete</mat-icon>
                     Delete
                 </button>

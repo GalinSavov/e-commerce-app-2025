@@ -15,6 +15,19 @@ export class CartService {
   itemCount = computed(() => {
     return this.shoppingCart()?.items.reduce((sum,item) => sum + item.quantity,0)
   });
+  totals = computed(() => {
+    const cart = this.shoppingCart();
+    if(!cart) return null;
+    const subTotal = cart.items.reduce((sum,item) => sum + (item.price * item.quantity),0);
+    const shipping = 0;
+    const discount = 0;
+    return {
+      subTotal,
+      shipping,
+      discount,
+      total: (subTotal + shipping) - discount
+    }
+  })
   private http = inject(HttpClient);
   getCart(id:string){
     return this.http.get<ShoppingCart>(this.apiURL + 'cart?id='+ id).pipe(
@@ -25,7 +38,12 @@ export class CartService {
     )
   }
   deleteCart(id:string){
-    return this.http.delete(this.apiURL+ 'cart?id=' + id)
+    return this.http.delete(this.apiURL+ 'cart?id=' + id).subscribe({
+      next: () =>{
+        localStorage.removeItem('cart_id');
+        this.shoppingCart.set(null);
+      }
+    })
   }
   setCart(shoppingCart:ShoppingCart){
     return this.http.post<ShoppingCart>(this.apiURL+'cart',shoppingCart).subscribe({
@@ -39,6 +57,25 @@ export class CartService {
     }
     cart.items = this.addOrUpdateItem(cart.items,item,quantity);
     this.setCart(cart);
+  }
+  removeItemFromCart(item:CartItem,quantity = 1){
+    const cart = this.shoppingCart();
+    if(!cart) return;
+    const index = cart.items.findIndex(x=>x.productId === item.productId);
+    if(index !== -1){
+      if(cart.items[index].quantity > quantity){
+        cart.items[index].quantity -= quantity;
+      }
+      else{
+        cart.items.splice(index,1);
+      }
+      if(cart.items.length === 0) {
+        this.deleteCart(cart.id);
+      }
+      else{
+        this.setCart(cart);
+      }
+    }
   }
   private addOrUpdateItem(items: CartItem[], item: CartItem, quantity: number): CartItem[] {
     const index = items.findIndex(x=>x.productId === item.productId)

@@ -11,13 +11,13 @@
                         <p class="text-3xl font-extrabold text-gray-900">{{product.price | currency}}</p>
                     </div>
                     <div class="flex gap-4 mt-6 items-stretch">
-                        <button mat-flat-button >
+                        <button mat-flat-button (click)="addItemToCart()" >
                             <mat-icon>shopping_cart</mat-icon>
                             Add To Cart
                         </button>
                         <mat-form-field appearance="outline" class="flex">
                             <mat-label>Quantity</mat-label>
-                            <input matInput type="number">
+                            <input matInput type="number" [(ngModel)]="quantity" [min]="1" (ngModelChange)="onQuantityChange($event)">
                         </mat-form-field>
                     </div>
                     <mat-divider></mat-divider>
