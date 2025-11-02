@@ -16,18 +16,18 @@ export class AccountService {
   login(values:LoginRequest){
     let params = new HttpParams();
     params = params.append('useCookies',true);
-    return this.http.post<User>(this.baseURL + 'login',values,{params});
+    return this.http.post<User>(this.baseURL + 'login',values,{params,withCredentials:true});
   }
   register(values:RegisterRequest){
     return this.http.post(this.baseURL + 'account/register',values)
   }
   getUserInfo(){
-    return this.http.get<User>(this.baseURL + 'account/user-info').subscribe({
+    return this.http.get<User>(this.baseURL + 'account/user-info',{withCredentials:true}).subscribe({
       next: response => this.currentUser.set(response)
     })
   }
   logout(){
-    return this.http.post(this.baseURL + 'account/logout',{});
+    return this.http.post(this.baseURL + 'account/logout',{},{withCredentials:true});
   }
   updateAddress(address:Address){
     return this.http.post(this.baseURL + 'account/address',address);
