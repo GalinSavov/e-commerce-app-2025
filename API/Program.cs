@@ -9,40 +9,71 @@ using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --------------------
 // Add services to the container
+// --------------------
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<StoreContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-builder.Services.AddScoped<IProductRepository, ProductRepository>(); // this service only exists for the lifetime of a HTTP request
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
 builder.Services.AddCors();
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 {
-    var connectionString = builder.Configuration.GetConnectionString("Redis") ?? throw new Exception("Can not get Redis connection string");
+    var connectionString = builder.Configuration.GetConnectionString("Redis") 
+        ?? throw new Exception("Can not get Redis connection string");
     var configuration = ConfigurationOptions.Parse(connectionString, true);
     return ConnectionMultiplexer.Connect(configuration);
 });
+
 builder.Services.AddSingleton<ICartService, CartService>();
+
+// Identity + Auth
+builder.Services.AddIdentityApiEndpoints<AppUser>()
+    .AddEntityFrameworkStores<StoreContext>();
+
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
 
+// --------------------
 // Configure the HTTP request pipeline
+// --------------------
+
+// Exception handling (must be before everything else)
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins("http://localhost:4200","https://localhost:4200"));
+
+// CORS must be before authentication & endpoints
+app.UseCors(policy => policy
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .WithOrigins("http://localhost:4200", "https://localhost:4200")
+);
+
+// These are required for cookie auth to work
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Controllers and Identity endpoints
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>();
+
+// --------------------
+// Database migration & seeding
+// --------------------
 try
 {
-    //apply any pending ef migrations
-    using var scope = app.Services.CreateScope(); //scope that is disposed of after it finishes executing
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<StoreContext>();
     await context.Database.MigrateAsync();
-    //seed data from a JSON file after applying pending migrations
     await StoreContextSeed.SeedAsync(context);
 }
 catch (Exception ex)
@@ -50,4 +81,5 @@ catch (Exception ex)
     Console.WriteLine(ex);
     throw;
 }
+
 app.Run();

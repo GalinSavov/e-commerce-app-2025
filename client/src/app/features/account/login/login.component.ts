@@ -30,7 +30,7 @@ export class LoginComponent {
     };
     this.accountService.login(loginRequest).subscribe({
       next: () => {
-        this.accountService.getUserInfo();
+        this.accountService.getUserInfo().subscribe();
         this.router.navigateByUrl('/shop');
       }
     })

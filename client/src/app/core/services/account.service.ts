@@ -5,6 +5,7 @@ import { User } from '../../shared/models/user';
 import { Address } from '../../shared/models/address';
 import { LoginRequest } from '../../shared/models/loginRequest';
 import { RegisterRequest } from '../../shared/models/registerRequest';
+import { map, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,9 +23,11 @@ export class AccountService {
     return this.http.post(this.baseURL + 'account/register',values)
   }
   getUserInfo(){
-    return this.http.get<User>(this.baseURL + 'account/user-info',{withCredentials:true}).subscribe({
-      next: response => this.currentUser.set(response)
-    })
+    return this.http.get<User>(this.baseURL + 'account/user-info',{withCredentials:true}).pipe(
+      map(user =>{
+        this.currentUser.set(user);
+        return user;
+      }))
   }
   logout(){
     return this.http.post(this.baseURL + 'account/logout',{},{withCredentials:true});
