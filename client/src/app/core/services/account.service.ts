@@ -17,20 +17,20 @@ export class AccountService {
   login(values:LoginRequest){
     let params = new HttpParams();
     params = params.append('useCookies',true);
-    return this.http.post<User>(this.baseURL + 'login',values,{params,withCredentials:true});
+    return this.http.post<User>(this.baseURL + 'login',values,{params});
   }
   register(values:RegisterRequest){
     return this.http.post(this.baseURL + 'account/register',values)
   }
   getUserInfo(){
-    return this.http.get<User>(this.baseURL + 'account/user-info',{withCredentials:true}).pipe(
+    return this.http.get<User>(this.baseURL + 'account/user-info').pipe(
       map(user =>{
         this.currentUser.set(user);
         return user;
       }))
   }
   logout(){
-    return this.http.post(this.baseURL + 'account/logout',{},{withCredentials:true});
+    return this.http.post(this.baseURL + 'account/logout',{});
   }
   updateAddress(address:Address){
     return this.http.post(this.baseURL + 'account/address',address);
