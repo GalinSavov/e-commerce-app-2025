@@ -5,7 +5,7 @@ import { User } from '../../shared/models/user';
 import { Address } from '../../shared/models/address';
 import { LoginRequest } from '../../shared/models/loginRequest';
 import { RegisterRequest } from '../../shared/models/registerRequest';
-import { map, catchError, of } from 'rxjs';
+import { map, catchError, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,14 @@ export class AccountService {
     return this.http.post(this.baseURL + 'account/logout',{});
   }
   updateAddress(address:Address){
-    return this.http.post(this.baseURL + 'account/address',address);
+    return this.http.post(this.baseURL + 'account/address',address).pipe(
+      tap(() => {
+        this.currentUser.update(user => {
+          if(user) user.address = address;
+          return user;
+        })
+      })
+    )
   }
   getAuthState(){
     return this.http.get<{isAuthenticated:boolean}>(this.baseURL + 'account/auth-status');
