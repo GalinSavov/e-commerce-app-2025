@@ -54,7 +54,7 @@ public class AccountController(SignInManager<AppUser> signInManager):BaseApiCont
             Address = user.Address?.ToDTO()
         });
     }
-    [HttpGet]
+    [HttpGet("auth-status")]
     public ActionResult GetAuthState()
     {
         return Ok(new { IsAuthenticated = User.Identity?.IsAuthenticated ?? false });

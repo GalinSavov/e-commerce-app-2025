@@ -5,7 +5,7 @@ import { MatCard } from '@angular/material/card';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { AccountService } from '../../../core/services/account.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoginRequest } from '../../../shared/models/loginRequest';
 
 @Component({
@@ -18,6 +18,13 @@ export class LoginComponent {
   protected formBuilder = inject(FormBuilder)
   protected accountService = inject(AccountService)
   protected router = inject(Router);
+  protected activatedRoute = inject(ActivatedRoute);
+  returnUrl = '/shop';
+
+  constructor(){
+    const url = this.activatedRoute.snapshot.queryParams['returnUrl'];
+    if(url) this.returnUrl = url;
+  }
   loginForm = this.formBuilder.group({
     email:[''],
     password:['']
@@ -31,7 +38,7 @@ export class LoginComponent {
     this.accountService.login(loginRequest).subscribe({
       next: () => {
         this.accountService.getUserInfo().subscribe();
-        this.router.navigateByUrl('/shop');
+        this.router.navigateByUrl(this.returnUrl);
       }
     })
   }
