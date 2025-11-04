@@ -22,6 +22,7 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
+
 builder.Services.AddCors();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
@@ -39,6 +40,7 @@ builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddEntityFrameworkStores<StoreContext>();
 
 builder.Services.AddAuthorization();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 
