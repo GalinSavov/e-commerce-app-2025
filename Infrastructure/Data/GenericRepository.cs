@@ -17,7 +17,7 @@ public class GenericRepository<T>(StoreContext storeContext) : IGenericRepositor
         storeContext.Set<T>().Remove(entity);
     }
 
-    public async Task<IReadOnlyList<T>> GetAllAsync()
+    public async Task<IReadOnlyList<T>> ListAllAsync()
     {
         var entities = await storeContext.Set<T>().ToListAsync();
         return entities;
