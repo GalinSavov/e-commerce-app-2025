@@ -12,10 +12,13 @@ import { AccountService } from '../../core/services/account.service';
 import { Address } from '../../shared/models/address';
 import { firstValueFrom } from 'rxjs';
 import { CheckoutDeliveryComponent } from "./checkout-delivery/checkout-delivery.component";
+import { CheckoutReviewComponent } from "./checkout-review/checkout-review.component";
+import { CartService } from '../../core/services/cart.service';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-checkout',
-  imports: [OrderSummaryComponent, MatStepperModule, RouterLink, MatButton, RouterLink, MatCheckboxModule, CheckoutDeliveryComponent],
+  imports: [OrderSummaryComponent, MatStepperModule, RouterLink, MatButton, RouterLink, MatCheckboxModule, CheckoutDeliveryComponent, CheckoutReviewComponent,CurrencyPipe],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
@@ -27,6 +30,7 @@ export class CheckoutComponent implements OnInit,OnDestroy {
   protected snackbarService = inject(SnackbarService);
   protected saveAddress = false;
   protected accountService = inject(AccountService);
+  protected cartService = inject(CartService);
 
   async ngOnInit() {
     try {
