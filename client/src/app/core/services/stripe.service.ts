@@ -71,7 +71,7 @@ export class StripeService {
     if(!cart) throw new Error('Problem with cart!');
     return this.http.post<ShoppingCart>(this.baseUrl+'payment/' + cart.id,{}).pipe(
       map(cart => {
-        this.cartService.shoppingCart.set(cart);
+        this.cartService.setCart(cart);
         return cart;
       })
     );

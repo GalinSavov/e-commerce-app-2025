@@ -11,10 +11,11 @@ import { StepperSelectionEvent } from '@angular/cdk/stepper';
 import { AccountService } from '../../core/services/account.service';
 import { Address } from '../../shared/models/address';
 import { firstValueFrom } from 'rxjs';
+import { CheckoutDeliveryComponent } from "./checkout-delivery/checkout-delivery.component";
 
 @Component({
   selector: 'app-checkout',
-  imports: [OrderSummaryComponent, MatStepperModule, RouterLink,MatButton,RouterLink,MatCheckboxModule],
+  imports: [OrderSummaryComponent, MatStepperModule, RouterLink, MatButton, RouterLink, MatCheckboxModule, CheckoutDeliveryComponent],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
@@ -41,6 +42,9 @@ export class CheckoutComponent implements OnInit,OnDestroy {
           firstValueFrom(this.accountService.updateAddress(address));
         }
       }
+    }
+    if(event.selectedIndex === 2){
+      await firstValueFrom(this.stripeService.createOrUpdatePaymentIntent());
     }
   }
   private async getAddressFromStripeAddress():Promise<Address | null> {
