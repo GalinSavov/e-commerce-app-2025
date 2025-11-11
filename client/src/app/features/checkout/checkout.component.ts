@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { OrderSummaryComponent } from "../../shared/components/order-summary/order-summary.component";
-import {MatStepperModule} from '@angular/material/stepper';
-import { RouterLink } from "@angular/router";
+import {MatStepper, MatStepperModule} from '@angular/material/stepper';
+import { Router, RouterLink } from "@angular/router";
 import { MatButton } from '@angular/material/button';
 import { StripeService } from '../../core/services/stripe.service';
 import { ConfirmationToken, StripeAddressElement, StripeAddressElementChangeEvent, StripePaymentElement, StripePaymentElementChangeEvent } from '@stripe/stripe-js';
@@ -24,6 +24,7 @@ import { CurrencyPipe, JsonPipe } from '@angular/common';
 })
 export class CheckoutComponent implements OnInit,OnDestroy {
   
+  protected router = inject(Router);
   protected stripeService = inject(StripeService);
   protected addressElement?:StripeAddressElement;
   protected paymentElement?:StripePaymentElement;
@@ -91,6 +92,23 @@ export class CheckoutComponent implements OnInit,OnDestroy {
     }
     if(event.selectedIndex === 3){
       await this.getConfirmationToken();
+    }
+  }
+  async confirmPayment(stepper:MatStepper){
+    try {
+      if(this.confirmationToken){
+        const result = await this.stripeService.confirmPayment(this.confirmationToken);
+        if(result.error){
+          throw new Error(result.error.message);
+        }else{
+          this.cartService.deleteCart();
+          this.cartService.deliveryMethod.set(null);
+          this.router.navigateByUrl('/checkout/success');
+        }
+      }
+    } catch (error:any) {
+      this.snackbarService.error(error.message || 'Something went wrong');
+      stepper.previous();
     }
   }
   private async getAddressFromStripeAddress():Promise<Address | null> {

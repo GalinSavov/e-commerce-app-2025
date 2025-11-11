@@ -40,8 +40,8 @@ export class CartService {
       })
     )
   }
-  deleteCart(id:string){
-    return this.http.delete(this.apiURL+ 'cart?id=' + id).subscribe({
+  deleteCart(){
+    return this.http.delete(this.apiURL+ 'cart?id=' + this.shoppingCart()?.id).subscribe({
       next: () =>{
         localStorage.removeItem('cart_id');
         this.shoppingCart.set(null);
@@ -73,7 +73,7 @@ export class CartService {
         cart.items.splice(index,1);
       }
       if(cart.items.length === 0) {
-        this.deleteCart(cart.id);
+        this.deleteCart();
       }
       else{
         this.setCart(cart);
