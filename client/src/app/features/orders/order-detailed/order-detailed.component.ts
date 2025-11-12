@@ -1,11 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { OrderService } from '../../../core/features/order.service';
+import { ActivatedRoute } from '@angular/router';
+import { Order } from '../../../shared/models/order';
+import { MatCardModule } from '@angular/material/card';
+import { MatButton } from '@angular/material/button';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-order-detailed',
-  imports: [],
+  imports: [MatCardModule,MatButton,DatePipe,CurrencyPipe],
   templateUrl: './order-detailed.component.html',
   styleUrl: './order-detailed.component.scss'
 })
-export class OrderDetailedComponent {
-
+export class OrderDetailedComponent implements OnInit {
+  ngOnInit(): void {
+    this.loadOrder();
+  }
+  protected orderService = inject(OrderService);
+  protected activatedRoute = inject(ActivatedRoute);
+  order?:Order;
+  loadOrder(){
+    const id = this.activatedRoute.snapshot.paramMap.get('id');
+    if(!id) return;
+    this.orderService.getOrder(+id).subscribe({
+      next:order => this.order = order
+    })
+  }
 }
