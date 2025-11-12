@@ -5,57 +5,57 @@ using Core.Specifications;
 using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
-    public class ProductsController(IGenericRepository<Product> repository) : BaseApiController
+    public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery]ProductSpecParams productParams)
         {
             var specification = new ProductSpecification(productParams);
-            return await CreatePagedResult(repository, specification, productParams.PageIndex, productParams.PageSize);
+            return await CreatePagedResult(unitOfWork.Repository<Product>(), specification, productParams.PageIndex, productParams.PageSize);
         }
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            Product? product = await repository.GetByIdAsync(id);
+            Product? product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             return product == null ? NotFound() : Ok(product);
         }
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
             var specification = new BrandListSpecification();
-            var brands = await repository.GetAllAsync<string>(specification);
+            var brands = await unitOfWork.Repository<Product>().GetAllAsync<string>(specification);
             return brands == null ? NotFound() : Ok(brands);
         }
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>>GetProductTypes()
         {
             var specification = new TypeListSpecification();
-            var types = await repository.GetAllAsync<string>(specification);
+            var types = await unitOfWork.Repository<Product>().GetAllAsync<string>(specification);
             return types == null ? NotFound() : Ok(types);
         }
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
-            repository.Create(product);
-            var result = await repository.SaveAllAsync();
+            unitOfWork.Repository<Product>().Create(product);
+            var result = await unitOfWork.Complete();
             return result ? CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product) : BadRequest(); // returns a 201 Created if true, a Location Route where the object can be found, and the body of the object
         }
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
-            if (!await repository.ProductExists(id)) return NotFound();
+            if (!await unitOfWork.Repository<Product>().ProductExists(id)) return NotFound();
             if (product.Id != id) return BadRequest("ID in route does not match product ID");
-            repository.Update(product);
-            await repository.SaveAllAsync();
+            unitOfWork.Repository<Product>().Update(product);
+            await unitOfWork.Complete();
             return NoContent();
         }
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {
-            Product? product = await repository.GetByIdAsync(id);
+            Product? product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             if (product == null) return NotFound();
-            repository.Delete(product);
-            await repository.SaveAllAsync();
+            unitOfWork.Repository<Product>().Delete(product);
+            await unitOfWork.Complete();
             return NoContent();
         }
     }

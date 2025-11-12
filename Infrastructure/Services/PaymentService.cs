@@ -6,10 +6,7 @@ using Stripe;
 
 namespace Infrastructure.Services;
 
-public class PaymentService(IConfiguration config,
-ICartService cartService,
-IGenericRepository<Core.Entities.Product> productRepo,
-IGenericRepository<DeliveryMethod> deliveryMethodRepo) : IPaymentService
+public class PaymentService(IConfiguration config,ICartService cartService,IUnitOfWork unitOfWork) : IPaymentService
 {
     public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
     {
@@ -19,13 +16,13 @@ IGenericRepository<DeliveryMethod> deliveryMethodRepo) : IPaymentService
         var shippingPrice = 0m;
         if (shoppingCart.DeliveryMethodId.HasValue) // fetch deliveryMethod from database, if not null - assign its value to shipping price
         {
-            var deliveryMethod = await deliveryMethodRepo.GetByIdAsync((int)shoppingCart.DeliveryMethodId);
+            var deliveryMethod = await unitOfWork.Repository<DeliveryMethod>().GetByIdAsync((int)shoppingCart.DeliveryMethodId);
             if (deliveryMethod == null) return null;
             shippingPrice = deliveryMethod.Price;
         }
         foreach (var item in shoppingCart.Items) // check that product exists and if the price of the items in the client match the price of the products on the database
         {
-            var productItem = await productRepo.GetByIdAsync(item.ProductId);
+            var productItem = await unitOfWork.Repository<Core.Entities.Product>().GetByIdAsync(item.ProductId);
             if (productItem == null) return null;
             if (item.Price != productItem.Price) item.Price = productItem.Price;
         }

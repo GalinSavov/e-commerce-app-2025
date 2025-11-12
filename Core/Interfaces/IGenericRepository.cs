@@ -13,7 +13,6 @@ public interface IGenericRepository<T> where T : BaseEntity
     void Create(T entity);
     void Delete(T entity);
     void Update(T entity);
-    Task<bool> SaveAllAsync();
     Task<bool> ProductExists(int id);
     Task<int> CountAsync(ISpecification<T> specification);
 }
