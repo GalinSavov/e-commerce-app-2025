@@ -6,6 +6,8 @@ public interface ISpecification<T>
     Expression<Func<T, bool>>? Criteria { get; } //Where query, this is passed into a specification evaluator class
     Expression<Func<T, object>>? OrderBy { get; }
     Expression<Func<T, object>>? OrderByDescending { get; }
+    List<Expression<Func<T, object>>> Includes { get; } 
+    List<string> IncludeStrings{ get; }
     bool IsDistinct { get; }
     //pagination properties
     public int Skip { get; }

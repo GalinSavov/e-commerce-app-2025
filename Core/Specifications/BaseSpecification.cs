@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 
 namespace Core.Specifications;
@@ -17,6 +18,19 @@ public class BaseSpecification<T>(Expression<Func<T, bool>>? criteria) : ISpecif
     public int Take { get; private set; }
 
     public bool IsPagingEnabled { get; private set; }
+
+    public List<Expression<Func<T, object>>> Includes { get; } = [];
+
+    public List<string> IncludeStrings { get; } = [];
+
+    protected void AddInclude(Expression<Func<T, object>> includeExpression)
+    {
+        Includes?.Add(includeExpression);
+    }
+    protected void AddInclude(string includeString)
+    {
+        IncludeStrings?.Add(includeString);
+    }
 
     protected void SetOrderBy(Expression<Func<T, object>> orderByExpression)
     {
