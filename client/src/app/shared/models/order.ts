@@ -9,7 +9,8 @@ export type Order = {
   orderItems: OrderItem[]
   subTotal: number
   orderStatus: string
-  paymentIntentId: string
+  paymentIntentId: string,
+  total:number
 }
 
 export type ShippingAddress = {
