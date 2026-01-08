@@ -1,4 +1,5 @@
 using API.MIddleware;
+using API.SignalR;
 using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
@@ -41,6 +42,7 @@ builder.Services.AddIdentityApiEndpoints<AppUser>()
 
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -66,6 +68,7 @@ app.UseAuthorization();
 // Controllers and Identity endpoints
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>();
+app.MapHub<NotificationHub>("/hub/notifications");
 
 // --------------------
 // Database migration & seeding
