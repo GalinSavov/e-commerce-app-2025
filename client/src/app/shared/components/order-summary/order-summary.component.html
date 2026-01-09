@@ -1,24 +1,24 @@
-<div class="mx-auto max-w-4xl flex-1 space-y-6 w-full">
-    <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm p-4">
+<div class="mx-auto max-w-4xl flex-1 space-y-6 w-full ">
+    <div class="space-y-4 rounded-lg border border-gray-200  shadow-sm p-4">
         <p class="text-xl font-semibold">Order Summary</p>
         <div class="space-y-4">
             <div class="space-y-2">
                 <dl class="flex items-center justify-between gap-4">
-                    <dt class="font-medium text-gray-500">Subtotal</dt>
-                    <dd class="font-medium text-gray-900">{{cartService.totals()?.subTotal| currency}}</dd>
+                    <dt class="font-medium ">Subtotal</dt>
+                    <dd class="font-medium">{{cartService.totals()?.subTotal| currency}}</dd>
                 </dl>
                 <dl class="flex items-center justify-between gap-4">
-                    <dt class="font-medium text-gray-500">Discount</dt>
+                    <dt class="font-medium ">Discount</dt>
                     <dd class="font-medium text-green-500">-{{cartService.totals()?.discount | currency}}</dd>
                 </dl>
                 <dl class="flex items-center justify-between gap-4">
-                    <dt class="font-medium text-gray-500">Delivery Fee</dt>
-                    <dd class="font-medium text-gray-900">{{cartService.totals()?.shipping | currency}}</dd>
+                    <dt class="font-medium ">Delivery Fee</dt>
+                    <dd class="font-medium">{{cartService.totals()?.shipping | currency}}</dd>
                 </dl>
             </div>
             <dl class="flex items-center justify-between gap-4 border-top border-gray-200 pt-2">
-                <dt class="font-medium text-gray-500">Total</dt>
-                <dd class="font-medium text-gray-900">{{cartService.totals()?.total | currency}}</dd>
+                <dt class="font-medium ">Total</dt>
+                <dd class="font-medium ">{{cartService.totals()?.total | currency}}</dd>
             </dl>
         </div>
         @if (location.path() !== '/checkout') {
@@ -28,7 +28,7 @@
             </div>
         }
     </div>
-    <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+    <div class="space-y-4 rounded-lg border border-gray-200  shadow-sm">
         <form class="space-y-2 flex flex-col p-2">
             <label class="mb-2 block text-sm font-medium ">
                 Do you have a voucher code?

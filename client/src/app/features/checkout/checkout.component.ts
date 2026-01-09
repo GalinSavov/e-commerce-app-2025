@@ -14,7 +14,7 @@ import { firstValueFrom } from 'rxjs';
 import { CheckoutDeliveryComponent } from "./checkout-delivery/checkout-delivery.component";
 import { CheckoutReviewComponent } from "./checkout-review/checkout-review.component";
 import { CartService } from '../../core/services/cart.service';
-import { CurrencyPipe, JsonPipe } from '@angular/common';
+import { CurrencyPipe} from '@angular/common';
 import{MatProgressSpinnerModule} from '@angular/material/progress-spinner'
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/features/order.service';
@@ -22,7 +22,7 @@ import { OrderService } from '../../core/features/order.service';
 @Component({
   selector: 'app-checkout',
   imports: [OrderSummaryComponent, MatStepperModule, RouterLink, MatButton, RouterLink, MatCheckboxModule, 
-    CheckoutDeliveryComponent, CheckoutReviewComponent,CurrencyPipe,JsonPipe,MatProgressSpinnerModule],
+    CheckoutDeliveryComponent, CheckoutReviewComponent,CurrencyPipe,MatProgressSpinnerModule],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
