@@ -77,6 +77,7 @@ app.MapFallbackToController("Index","Fallback");
 // --------------------
 // Database migration & seeding
 // --------------------
+/*
 try
 {
     using var scope = app.Services.CreateScope();
@@ -90,5 +91,6 @@ catch (Exception ex)
     Console.WriteLine(ex);
     throw;
 }
+*/
 
 app.Run();
