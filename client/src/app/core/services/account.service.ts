@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../environments/environment.development';
+import { environment } from '../../../environments/environment';
 import { User } from '../../shared/models/user';
 import { Address } from '../../shared/models/address';
 import { LoginRequest } from '../../shared/models/loginRequest';
