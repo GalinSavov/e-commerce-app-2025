@@ -11,7 +11,7 @@ import { DeliveryMethod } from '../../shared/models/deliveryMethod';
   providedIn: 'root'
 })
 export class CartService {
-  apiURL = environment.apiURL;
+  baseURL = environment.apiURL;
   shoppingCart = signal<ShoppingCart | null>(null);
   deliveryMethod = signal<DeliveryMethod | null>(null);
   itemCount = computed(() => {
@@ -33,7 +33,7 @@ export class CartService {
   })
   private http = inject(HttpClient);
   getCart(id:string){
-    return this.http.get<ShoppingCart>(this.apiURL + 'cart?id='+ id).pipe(
+    return this.http.get<ShoppingCart>(this.baseURL + 'cart?id='+ id).pipe(
       map(cart => {
         this.shoppingCart.set(cart);
         return cart;
@@ -41,7 +41,7 @@ export class CartService {
     )
   }
   deleteCart(){
-    return this.http.delete(this.apiURL+ 'cart?id=' + this.shoppingCart()?.id).subscribe({
+    return this.http.delete(this.baseURL+ 'cart?id=' + this.shoppingCart()?.id).subscribe({
       next: () =>{
         localStorage.removeItem('cart_id');
         this.shoppingCart.set(null);
@@ -49,7 +49,7 @@ export class CartService {
     })
   }
   setCart(shoppingCart:ShoppingCart){
-    return this.http.post<ShoppingCart>(this.apiURL+'cart',shoppingCart).subscribe({
+    return this.http.post<ShoppingCart>(this.baseURL+'cart',shoppingCart).subscribe({
       next:response => this.shoppingCart.set(response)
     })
   }
