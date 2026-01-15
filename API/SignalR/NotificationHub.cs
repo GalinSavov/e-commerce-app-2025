@@ -9,10 +9,16 @@ namespace API.SignalR;
 public class NotificationHub:Hub
 {
     private static readonly ConcurrentDictionary<string,string> UserConnections = new();
+    private readonly ILogger<NotificationHub> _logger;
+
+    public NotificationHub(ILogger<NotificationHub> logger)
+    {
+        _logger = logger;
+    }
     public override Task OnConnectedAsync()
     {
         var email = Context.User?.GetEmail();
-        Console.WriteLine($"SignalR connected. Email: {email ?? "NULL"}");
+        _logger.LogInformation("SignalR connected. Email: {Email}", email);
         if (!string.IsNullOrEmpty(email))
         {
             UserConnections[email] = Context.ConnectionId;
