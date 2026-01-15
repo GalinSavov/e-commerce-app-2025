@@ -14,18 +14,9 @@ import { OrderService } from '../../../core/features/order.service';
   templateUrl: './checkout-success.component.html',
   styleUrl: './checkout-success.component.scss'
 })
-export class CheckoutSuccessComponent implements OnDestroy,OnInit{
+export class CheckoutSuccessComponent implements OnDestroy{
   protected signalrService = inject(SignalrService);
   private orderService = inject(OrderService);
-   ngOnInit(): void {
-    const lastOrderId = Number(localStorage.getItem('lastOrderId'));
-
-    if (!this.signalrService.orderSignal() && lastOrderId) {
-      this.orderService.getOrder(lastOrderId).subscribe(order => {
-        this.signalrService.orderSignal.set(order);
-      });
-    }
-  }
   ngOnDestroy(): void {
     this.orderService.orderComplete = false;
     this.signalrService.orderSignal.set(null);

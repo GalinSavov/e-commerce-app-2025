@@ -12,6 +12,7 @@ public class NotificationHub:Hub
     public override Task OnConnectedAsync()
     {
         var email = Context.User?.GetEmail();
+        Console.WriteLine($"SignalR connected. Email: {email ?? "NULL"}");
         if (!string.IsNullOrEmpty(email))
         {
             UserConnections[email] = Context.ConnectionId;
