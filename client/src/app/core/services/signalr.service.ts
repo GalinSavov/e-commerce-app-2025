@@ -6,6 +6,7 @@ import { Order } from '../../shared/models/order';
   providedIn: 'root'
 })
 export class SignalrService {
+  
   hubURL = environment.hubURL;
   hubConnection?:HubConnection;
   orderSignal = signal<Order | null>(null);
