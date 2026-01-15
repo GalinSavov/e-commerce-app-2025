@@ -112,6 +112,8 @@ export class CheckoutComponent implements OnInit,OnDestroy {
             this.orderService.orderComplete = true;
             this.cartService.deleteCart();
             this.cartService.deliveryMethod.set(null);
+            //store the order id
+            localStorage.setItem('lastOrderId', orderResult.id.toString());
             this.router.navigateByUrl('/checkout/success');
           }else{
             throw new Error('Order creation failed!');
