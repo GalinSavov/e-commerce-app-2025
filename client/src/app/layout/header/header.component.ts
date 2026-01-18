@@ -9,6 +9,7 @@ import { CartService } from '../../core/services/cart.service';
 import { AccountService } from '../../core/services/account.service';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-header',
@@ -32,6 +33,7 @@ export class HeaderComponent {
   protected cartService = inject(CartService);
   protected accountService = inject(AccountService);
   protected router = inject(Router);
+  protected env = environment;
 
   logout(){
     this.accountService.logout().subscribe({
