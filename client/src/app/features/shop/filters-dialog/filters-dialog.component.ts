@@ -16,7 +16,7 @@ export class FiltersDialogComponent {
   protected dialogRef = inject(MatDialogRef<FiltersDialogComponent>);
   data = inject(MAT_DIALOG_DATA);
 
-  selectedBrands: string[] = this.data.selecte2dBrands;
+  selectedBrands: string[] = this.data.selectedBrands;
   selectedTypes: string[] = this.data.selectedTypes;
 
   applyFilters()

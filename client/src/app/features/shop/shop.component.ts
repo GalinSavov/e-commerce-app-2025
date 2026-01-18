@@ -13,10 +13,11 @@ import { ShopParams } from '../../shared/models/shopParams';
 import { Pagination } from '../../shared/models/pagination';
 import { FormsModule } from '@angular/forms';
 import { MatIconButton } from "@angular/material/button";
+import { EmptyStateComponent } from "../../shared/components/empty-state/empty-state.component";
 
 @Component({
   selector: 'app-shop',
-  imports: [ProductItemComponent, MatButton, MatIcon, MatMenu, MatSelectionList, MatListOption, MatMenuTrigger, MatPaginator, FormsModule, MatIconButton],
+  imports: [ProductItemComponent, MatButton, MatIcon, MatMenu, MatSelectionList, MatListOption, MatMenuTrigger, MatPaginator, FormsModule, MatIconButton, EmptyStateComponent],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
@@ -40,9 +41,16 @@ export class ShopComponent implements OnInit {
     this.getProductBrands();
     this.getProductTypes();
   }
+  resetFilters(){
+    this.shopParams = new ShopParams();
+    this.getProducts();
+  }
   getProducts(){
     this.shopService.getProducts(this.shopParams).subscribe({
-      next: response => this.products = response,
+      next: response => {
+        this.products = response;
+        console.log(response);
+      },
       error: error => console.log(error),
     });
   }

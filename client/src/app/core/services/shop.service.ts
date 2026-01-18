@@ -15,10 +15,10 @@ export class ShopService {
   types:string[] = [];
   getProducts(shopParams:ShopParams){
     let params = new HttpParams();
-    if(shopParams.brands.length > 0){
+    if(shopParams.brands && shopParams.brands.length > 0){
       params = params.append('brands',shopParams.brands.join(','));
     }
-    if(shopParams.types.length > 0){
+    if(shopParams.types && shopParams.types.length > 0){
       params = params.append('types',shopParams.types.join(','));
     }
     if(shopParams.sort){
