@@ -30,6 +30,7 @@ public class PaymentController(IPaymentService paymentService,IUnitOfWork unitOf
     [HttpPost("webhook")]
     public async Task<IActionResult> StripeWebHook()
     {
+        
         var json = await new StreamReader(Request.Body).ReadToEndAsync();
         Event stripeEvent;
         try
@@ -43,10 +44,8 @@ public class PaymentController(IPaymentService paymentService,IUnitOfWork unitOf
         catch (StripeException ex)
         {
             logger.LogWarning(ex, "Invalid Stripe signature");
-            return BadRequest(); // ✅ NOT 500
+            return BadRequest();
         }
-
-        // ✅ Only handle what you care about
         if (stripeEvent.Type == "payment_intent.succeeded")
         {
             var intent = stripeEvent.Data.Object as PaymentIntent;
@@ -55,7 +54,6 @@ public class PaymentController(IPaymentService paymentService,IUnitOfWork unitOf
                 await HandlePaymentIntentSucceeded(intent);
             }
         }
-        // ✅ Always ACK Stripe
         return Ok();
     }
 
@@ -68,10 +66,15 @@ public class PaymentController(IPaymentService paymentService,IUnitOfWork unitOf
         if (order == null)
         {
             logger.LogWarning("Order not found for PaymentIntent {IntentId}", intent.Id);
-            return; // ✅ do NOT throw
+            return;
         }
-        var expectedAmount = (long)Math.Round(order.GetTotal() * 100, MidpointRounding.AwayFromZero);
-        if (expectedAmount != intent.Amount)
+        var orderTotalInCents = (long)Math.Round(order.GetTotal() * 100m, MidpointRounding.AwayFromZero);
+        var paid = intent.AmountReceived > 0 ? intent.AmountReceived : intent.Amount;
+        logger.LogWarning(
+            "Mismatch debug: OrderId={OrderId} Total={Total} ExpectedCents={Expected} Paid={Paid} Currency={Currency} IntentId={IntentId}",
+            order.Id, order.GetTotal(), orderTotalInCents, paid, intent.Currency, intent.Id
+            );
+        if (orderTotalInCents != paid)
         {
             order.OrderStatus = OrderStatus.PaymentMismatch;
         }

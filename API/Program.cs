@@ -7,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,8 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICouponService,Infrastructure.Services.CouponService>();
+
 
 builder.Services.AddCors();
 
@@ -52,6 +55,7 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddSignalR();
 
 var app = builder.Build();
+StripeConfiguration.ApiKey = builder.Configuration["StripeSettings:SecretKey"];
 
 // --------------------
 // Configure the HTTP request pipeline

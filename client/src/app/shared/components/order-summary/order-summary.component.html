@@ -33,11 +33,14 @@
             <label class="mb-2 block text-sm font-medium ">
                 Do you have a voucher code?
             </label>
+            @if (cartService.shoppingCart()?.coupon) {
+                <label class="text-green-500">{{this.cartService.shoppingCart()?.coupon?.name}} <mat-icon class="text-red-500 cursor-pointer" (click)="removeCouponCode()">close</mat-icon></label>
+            }
             <mat-form-field appearance="outline">
                 <mat-label>Voucher Code</mat-label>
-                <input type="text" matInput>
+                <input [disabled]="this.cartService.shoppingCart()?.coupon ? true : false" type="text" matInput [(ngModel)]="voucherCode" name="voucherCode">
             </mat-form-field>
-            <button mat-flat-button>Apply Code</button>
+            <button [disabled]="this.cartService.shoppingCart()?.coupon ? true : false" (click)="applyCouponCode()" mat-flat-button>Apply Code</button>
         </form>
     </div>
 </div>

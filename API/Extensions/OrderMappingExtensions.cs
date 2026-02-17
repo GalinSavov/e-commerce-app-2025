@@ -22,6 +22,7 @@ public static class OrderMappingExtensions
             Total = order.GetTotal(),
             OrderStatus = order.OrderStatus.ToString(),
             PaymentIntentId = order.PaymentIntentId,
+            Discount = order.Discount
         };
     }
     public static OrderItemDTO ToDTO(this OrderItem orderItem)

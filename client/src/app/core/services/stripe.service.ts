@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from './cart.service';
 import { ShoppingCart } from '../../shared/models/shoppingCart';
-import { firstValueFrom, map, Observable } from 'rxjs';
+import { firstValueFrom, map, Observable, of, switchMap } from 'rxjs';
 import { AccountService } from './account.service';
 
 @Injectable({
@@ -108,15 +108,19 @@ export class StripeService {
       throw new Error('Unable to load stripe');
     }
   }
-  createOrUpdatePaymentIntent():Observable<ShoppingCart>{
+  createOrUpdatePaymentIntent(){
     const cart = this.cartService.shoppingCart();
-    if(!cart) throw new Error('Problem with cart!');
-    return this.http.post<ShoppingCart>(this.baseUrl+'payment/' + cart.id,{}).pipe(
-      map(cart => {
-        this.cartService.setCart(cart);
-        return cart;
-      })
-    );
+    if (!cart) throw new Error('Problem with cart!');
+    // Always call backend so amount reflects latest cart (delivery, coupons, etc.)
+    return this.http
+      .post<ShoppingCart>(`${this.baseUrl}payment/${cart.id}`, {})
+      .pipe(
+        switchMap(updatedCart =>
+          this.cartService.setCart(updatedCart).pipe(
+            map(() => updatedCart)
+          )
+        )
+      );
   }
   disposeElements(){
     this.elements = undefined;

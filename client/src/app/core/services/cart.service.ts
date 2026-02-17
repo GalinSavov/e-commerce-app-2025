@@ -1,10 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
-import { createNewCart, ShoppingCart } from '../../shared/models/shoppingCart';
+import { Coupon, createNewCart, ShoppingCart } from '../../shared/models/shoppingCart';
 import { HttpClient } from '@angular/common/http';
 import { CartItem } from '../../shared/models/cartItem';
 import { Product } from '../../shared/models/product';
-import { map } from 'rxjs';
+import { firstValueFrom, map, Observable, tap } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 
 @Injectable({
@@ -23,7 +23,16 @@ export class CartService {
     if(!cart) return null;
     const subTotal = cart.items.reduce((sum,item) => sum + (item.price * item.quantity),0);
     const shipping = deliveryMethod ? deliveryMethod.price : 0;
-    const discount = 0;
+    let discount = 0;
+    const coupon = cart.coupon;
+    if (coupon) {
+      // Match backend logic: percentage OR amount off (amountOff is in cents from Stripe)
+      if (coupon.percentOff) {
+        discount = subTotal * (coupon.percentOff / 100);
+      } else if (coupon.amountOff) {
+        discount = coupon.amountOff / 100;
+      }
+    }
     return {
       subTotal,
       shipping,
@@ -49,19 +58,21 @@ export class CartService {
     })
   }
   setCart(shoppingCart:ShoppingCart){
-    return this.http.post<ShoppingCart>(this.baseURL+'cart',shoppingCart).subscribe({
-      next:response => this.shoppingCart.set(response)
-    })
+    return this.http.post<ShoppingCart>(this.baseURL+'cart',shoppingCart).pipe(
+      tap(cart => {
+        this.shoppingCart.set(cart);
+      })
+    )
   }
-  addItemToCart(item:CartItem | Product, quantity = 1){
+  async addItemToCart(item:CartItem | Product, quantity = 1){
     const cart = this.shoppingCart() ?? this.createCart();
     if(this.isProduct(item)){
       item = this.mapProductToCartItem(item);
     }
     cart.items = this.addOrUpdateItem(cart.items,item,quantity);
-    this.setCart(cart);
+    await firstValueFrom(this.setCart(cart));
   }
-  removeItemFromCart(item:CartItem,quantity = 1){
+  async removeItemFromCart(item:CartItem,quantity = 1){
     const cart = this.shoppingCart();
     if(!cart) return;
     const index = cart.items.findIndex(x=>x.productId === item.productId);
@@ -76,7 +87,7 @@ export class CartService {
         this.deleteCart();
       }
       else{
-        this.setCart(cart);
+        await firstValueFrom(this.setCart(cart));
       }
     }
   }
@@ -110,5 +121,8 @@ export class CartService {
     const cart = createNewCart();
     localStorage.setItem('cart_id',cart.id);
     return cart;
+  }
+  validateCoupon(code:string):Observable<Coupon>{
+    return this.http.get<Coupon>(this.baseURL + "coupons/"+ code);
   }
 }

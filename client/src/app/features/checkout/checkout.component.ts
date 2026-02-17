@@ -131,6 +131,7 @@ export class CheckoutComponent implements OnInit,OnDestroy {
   }
   private async createOrderModel(): Promise<OrderToCreate>{
     const cart = this.cartService.shoppingCart();
+    const discount = this.cartService.totals()?.discount;
     const shippingAddress = await this.getAddressFromStripeAddress() as ShippingAddress;
     const card = this.confirmationToken?.payment_method_preview.card;
     if(!cart?.id || !cart.deliveryMethodId || !card || !shippingAddress){
@@ -145,7 +146,8 @@ export class CheckoutComponent implements OnInit,OnDestroy {
         expYear:card.exp_year
       },
       deliveryMethodId:cart.deliveryMethodId,
-      shippingAddress
+      shippingAddress,
+      discount: discount
     };
     return order;
   }

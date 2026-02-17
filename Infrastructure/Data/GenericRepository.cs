@@ -75,4 +75,6 @@ public class GenericRepository<T>(StoreContext storeContext) : IGenericRepositor
         specification.ApplyCriteria(query);
         return await query.CountAsync();
     }
+
+
 }

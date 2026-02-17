@@ -11,28 +11,89 @@ public class PaymentService(IConfiguration config,ICartService cartService,IUnit
     public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
     {
         StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
-        var shoppingCart = await cartService.GetCartAsync(cartId); // get cart and check if its null
-        if (shoppingCart == null) return null;
-        var shippingPrice = 0m;
-        if (shoppingCart.DeliveryMethodId.HasValue) // fetch deliveryMethod from database, if not null - assign its value to shipping price
+
+        var shoppingCart = await cartService.GetCartAsync(cartId) ?? throw new NullReferenceException("Cart Unavailable!"); // get cart and check if its null
+
+        // All calculations in domain are done in dollars
+        var shippingPriceDollars = await GetShippingPriceAsync(shoppingCart);
+
+        await ValidateItemsInShoppingCartAsync(shoppingCart);
+
+        var subtotalDollars = CalculateSubtotal(shoppingCart);
+
+        if (shoppingCart.Coupon != null)
         {
-            var deliveryMethod = await unitOfWork.Repository<DeliveryMethod>().GetByIdAsync((int)shoppingCart.DeliveryMethodId);
-            if (deliveryMethod == null) return null;
+            subtotalDollars = await ApplyDiscountAsync(shoppingCart, subtotalDollars);
+        }
+
+        var totalDollars = subtotalDollars + shippingPriceDollars;
+
+        // Convert once to cents at the Stripe boundary
+        var totalInCents = (long)Math.Round(totalDollars * 100m, MidpointRounding.AwayFromZero);
+
+        await CreateUpdatePaymentIntentAsync(shoppingCart, totalInCents);
+
+        await cartService.SetCartAsync(shoppingCart);
+        
+        return shoppingCart;
+    }
+    // Returns shipping price in dollars
+    private async Task<decimal> GetShippingPriceAsync(ShoppingCart shoppingCart)
+    {
+        decimal shippingPrice = 0;
+        if (shoppingCart.DeliveryMethodId.HasValue)
+        {
+            var deliveryMethod = await unitOfWork.Repository<DeliveryMethod>().GetByIdAsync((int)shoppingCart.DeliveryMethodId) 
+                ?? throw new NullReferenceException("Delivery Method Not Found!");
             shippingPrice = deliveryMethod.Price;
         }
-        foreach (var item in shoppingCart.Items) // check that product exists and if the price of the items in the client match the price of the products on the database
+        return shippingPrice;
+    }
+    private async Task ValidateItemsInShoppingCartAsync(ShoppingCart shoppingCart)
+    {
+        foreach (var item in shoppingCart.Items)
         {
-            var productItem = await unitOfWork.Repository<Core.Entities.Product>().GetByIdAsync(item.ProductId);
-            if (productItem == null) return null;
+            var productItem = await unitOfWork.Repository<Core.Entities.Product>().GetByIdAsync(item.ProductId) ?? throw new NullReferenceException("Product Item in Cart Not Found!");
             if (item.Price != productItem.Price) item.Price = productItem.Price;
         }
+    }
+    // Subtotal in dollars
+    private static decimal CalculateSubtotal(ShoppingCart shoppingCart)
+    {
+        var subtotal = shoppingCart.Items.Sum(i => i.Price * i.Quantity); // decimal
+        return subtotal;
+    }
+    // Apply discount to an amount in dollars
+    private static async Task<decimal> ApplyDiscountAsync(ShoppingCart shoppingCart, decimal amountDollars)
+    {
+        var couponId = shoppingCart.Coupon!.CouponId;
+        var coupon = await new Stripe.CouponService().GetAsync(couponId)
+                    ?? throw new NullReferenceException("Coupon Not Found!");
+
+        if (coupon.PercentOff is not null)
+        {
+            var discount = amountDollars * (coupon.PercentOff.Value / 100m);
+            // Round to cents in dollars
+            return amountDollars - Math.Round(discount, 2, MidpointRounding.AwayFromZero);
+        }
+
+        if (coupon.AmountOff is not null)
+        {
+            // Stripe AmountOff is in the smallest currency unit (cents)
+            var amountOffDollars = coupon.AmountOff.Value / 100m;
+            return Math.Max(0, amountDollars - amountOffDollars);
+        }
+            return amountDollars;
+        }
+    private static async Task CreateUpdatePaymentIntentAsync(ShoppingCart shoppingCart,long amount)
+    {
         var paymentIntentService = new PaymentIntentService();
         PaymentIntent? paymentIntent = null;
         if (string.IsNullOrEmpty(shoppingCart.PaymentIntentId)) // if no payment intent exists, create one, assign the client secret and paymentIntentId to the cart properties
         {
             var options = new PaymentIntentCreateOptions
             {
-                Amount = (long)shoppingCart.Items.Sum(x => x.Quantity * (x.Price * 100)) + (long)shippingPrice * 100,
+                Amount = amount,
                 Currency = "usd",
                 PaymentMethodTypes = ["card"]
             };
@@ -44,11 +105,9 @@ public class PaymentService(IConfiguration config,ICartService cartService,IUnit
         {
             var options = new PaymentIntentUpdateOptions
             {
-                Amount = (long)shoppingCart.Items.Sum(x => x.Quantity * (x.Price * 100)) + (long)shippingPrice * 100
+                Amount = amount
             };
             paymentIntent = await paymentIntentService.UpdateAsync(shoppingCart.PaymentIntentId, options);
         }
-        await cartService.SetCartAsync(shoppingCart);
-        return shoppingCart;
     }
 }

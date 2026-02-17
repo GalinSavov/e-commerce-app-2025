@@ -10,6 +10,7 @@ export type Order = {
   subTotal: number
   orderStatus: string
   paymentIntentId: string,
+  discount: number,
   total:number
 }
 
@@ -41,5 +42,6 @@ export type OrderToCreate = {
     cartId:string,
     deliveryMethodId:number,
     shippingAddress:ShippingAddress,
+    discount?:number,
     paymentSummary:PaymentSummary
 }

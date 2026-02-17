@@ -17,4 +17,5 @@ public class OrderDTO
     public required string OrderStatus { get; set; }
     public required string PaymentIntentId { get; set; }
     public decimal Total { get; set; }
+    public decimal Discount { get; set; }
 }

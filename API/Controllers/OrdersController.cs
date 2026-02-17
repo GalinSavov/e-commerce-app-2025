@@ -34,7 +34,7 @@ public class OrdersController(ICartService cartService,IUnitOfWork unitOfWork):B
             var orderItem = new OrderItem
             {
                 ItemOrdered = itemOrdered,
-                Price = productItem.Price,
+                Price = item.Price,
                 Quantity = item.Quantity
             };
             orderItems.Add(orderItem);
@@ -50,6 +50,7 @@ public class OrdersController(ICartService cartService,IUnitOfWork unitOfWork):B
             PaymentSummary = createOrderDTO.PaymentSummary,
             PaymentIntentId = cart.PaymentIntentId,
             BuyerEmail = email,
+            Discount = createOrderDTO.Discount ?? 0
         };
         unitOfWork.Repository<Order>().Create(order);
         if (await unitOfWork.Complete()) return Ok(order);
