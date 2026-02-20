@@ -16,6 +16,7 @@ import { OrderComponent } from './features/orders/order.component';
 import { OrderDetailedComponent } from './features/orders/order-detailed/order-detailed.component';
 import { orderCompleteGuard } from './core/guards/order-complete-guard';
 import { AdminComponent } from './features/admin/admin.component';
+import { adminGuard } from './core/guards/admin-guard';
 
 export const routes: Routes = [
     {path: '', component:HomeComponent},
@@ -30,7 +31,7 @@ export const routes: Routes = [
     {path: 'account/register',component:RegisterComponent},
     {path: 'test-error', component:TestErrorComponent},
     {path: 'server-error', component:ServerErrorComponent},
-    {path: 'admin', component:AdminComponent,canActivate:[authGuard]},
+    {path: 'admin', component:AdminComponent,canActivate:[authGuard,adminGuard]},
     {path: 'not-found', component:NotFoundComponent},
     {path: '**', redirectTo: 'not-found', pathMatch:'full'},
 ];
