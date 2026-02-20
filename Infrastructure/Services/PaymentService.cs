@@ -6,12 +6,19 @@ using Stripe;
 
 namespace Infrastructure.Services;
 
-public class PaymentService(IConfiguration config,ICartService cartService,IUnitOfWork unitOfWork) : IPaymentService
+public class PaymentService: IPaymentService
 {
-    public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
+    private readonly ICartService cartService;
+    private readonly IUnitOfWork unitOfWork;
+
+    public PaymentService(IConfiguration config,ICartService cartService,IUnitOfWork unitOfWork)
     {
         StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
-
+        this.cartService = cartService;
+        this.unitOfWork = unitOfWork;
+    }
+    public async Task<ShoppingCart?> CreateOrUpdatePaymentIntent(string cartId)
+    {
         var shoppingCart = await cartService.GetCartAsync(cartId) ?? throw new NullReferenceException("Cart Unavailable!"); // get cart and check if its null
 
         // All calculations in domain are done in dollars
@@ -36,6 +43,16 @@ public class PaymentService(IConfiguration config,ICartService cartService,IUnit
         await cartService.SetCartAsync(shoppingCart);
         
         return shoppingCart;
+    }
+    public async Task<string> RefundPayment(string paymentIntentId)
+    {
+        var refundOptions = new RefundCreateOptions
+        {
+            PaymentIntent = paymentIntentId
+        };
+        var refundService = new RefundService();
+        var result = await refundService.CreateAsync(refundOptions);
+        return result.Status; // Return the status of the refund (e.g., "succeeded", "pending", "failed")
     }
     // Returns shipping price in dollars
     private async Task<decimal> GetShippingPriceAsync(ShoppingCart shoppingCart)
@@ -110,4 +127,6 @@ public class PaymentService(IConfiguration config,ICartService cartService,IUnit
             paymentIntent = await paymentIntentService.UpdateAsync(shoppingCart.PaymentIntentId, options);
         }
     }
+
+    
 }
