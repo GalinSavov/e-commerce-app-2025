@@ -27,6 +27,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case 401:
           snackbar.error(error.error.title);
           break;
+        case 403:
+          snackbar.error('You are not authorized to access this page');
+          break;
         case 404:
           router.navigateByUrl('/not-found'); 
           break;

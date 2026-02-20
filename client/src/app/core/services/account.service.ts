@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { User } from '../../shared/models/user';
 import { Address } from '../../shared/models/address';
@@ -16,6 +16,10 @@ export class AccountService {
   private baseURL = environment.apiURL;
   private signalrService = inject(SignalrService);
   currentUser = signal<User | null>(null);
+  isAdmin = computed(() => {
+    const roles = this.currentUser()?.roles;
+    return Array.isArray(roles) ? roles.includes('Admin') : roles === 'Admin';
+  });
   login(values:LoginRequest){
     let params = new HttpParams();
     params = params.append('useCookies',true);
