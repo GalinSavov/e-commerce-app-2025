@@ -2,6 +2,7 @@ using API.RequestHelpers;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Specifications;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
@@ -33,6 +34,7 @@ namespace API.Controllers
             var types = await unitOfWork.Repository<Product>().GetAllAsync<string>(specification);
             return types == null ? NotFound() : Ok(types);
         }
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
@@ -40,6 +42,7 @@ namespace API.Controllers
             var result = await unitOfWork.Complete();
             return result ? CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product) : BadRequest(); // returns a 201 Created if true, a Location Route where the object can be found, and the body of the object
         }
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
         {
@@ -49,6 +52,7 @@ namespace API.Controllers
             await unitOfWork.Complete();
             return NoContent();
         }
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
         {

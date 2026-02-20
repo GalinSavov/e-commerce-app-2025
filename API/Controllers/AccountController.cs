@@ -51,7 +51,8 @@ public class AccountController(SignInManager<AppUser> signInManager):BaseApiCont
             user.FirstName,
             user.LastName,
             user.Email,
-            Address = user.Address?.ToDTO()
+            Address = user.Address?.ToDTO(),
+            Roles = User.FindFirstValue(ClaimTypes.Role)
         });
     }
     [HttpGet("auth-status")]
