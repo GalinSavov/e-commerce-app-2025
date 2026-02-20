@@ -1,13 +1,25 @@
 using System.Reflection;
 using System.Text.Json;
 using Core.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Data;
 
 public class StoreContextSeed
 {
-    public static async Task SeedAsync(StoreContext storeContext)
+    public static async Task SeedAsync(StoreContext storeContext,UserManager<AppUser> userManager)
     {
+        if(!userManager.Users.Any(x => x.UserName == "admin@test.com"))
+        {
+            var adminUser = new AppUser
+            {
+                UserName = "admin@test.com",
+                Email = "admin@test.com"
+            };
+           
+            await userManager.CreateAsync(adminUser, "Pa$$w0rd");
+            await userManager.AddToRoleAsync(adminUser,"Admin");
+        }
         var path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         if (!storeContext.Products.Any()) // check if the database is empty
         {
