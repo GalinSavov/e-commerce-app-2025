@@ -8,18 +8,21 @@ namespace API.Controllers
 {
     public class ProductsController(IUnitOfWork unitOfWork) : BaseApiController
     {
+        [Cache(600)]
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery]ProductSpecParams productParams)
         {
             var specification = new ProductSpecification(productParams);
             return await CreatePagedResult(unitOfWork.Repository<Product>(), specification, productParams.PageIndex, productParams.PageSize);
         }
+        [Cache(600)]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
             Product? product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
             return product == null ? NotFound() : Ok(product);
         }
+        [Cache(10000)]
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<string>>> GetProductBrands()
         {
@@ -27,6 +30,7 @@ namespace API.Controllers
             var brands = await unitOfWork.Repository<Product>().GetAllAsync<string>(specification);
             return brands == null ? NotFound() : Ok(brands);
         }
+        [Cache(10000)]
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<string>>>GetProductTypes()
         {
@@ -34,6 +38,7 @@ namespace API.Controllers
             var types = await unitOfWork.Repository<Product>().GetAllAsync<string>(specification);
             return types == null ? NotFound() : Ok(types);
         }
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
@@ -42,6 +47,7 @@ namespace API.Controllers
             var result = await unitOfWork.Complete();
             return result ? CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product) : BadRequest(); // returns a 201 Created if true, a Location Route where the object can be found, and the body of the object
         }
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<ActionResult> UpdateProduct(int id, Product product)
@@ -52,6 +58,7 @@ namespace API.Controllers
             await unitOfWork.Complete();
             return NoContent();
         }
+        [InvalidateCache("api/products|")]
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteProduct(int id)
