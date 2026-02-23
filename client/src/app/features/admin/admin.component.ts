@@ -15,6 +15,7 @@ import { RouterLink } from '@angular/router';
 import { DialogService } from '../../core/services/dialog.service';
 @Component({
   selector: 'app-admin',
+  standalone: true,
   imports: [
     MatTableModule,
     MatPaginatorModule,
