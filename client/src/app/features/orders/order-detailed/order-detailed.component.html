@@ -5,7 +5,7 @@
                 <h2 class="text-2xl text-center font-semibold">Order Summary for order #{{order.id}}</h2>
                 <button routerLink="/orders" mat-stroked-button (click)="onReturnClick()">{{buttonText}}</button>
             </div>
-            <div class="mt-8 py-3 border-t border-gray-200 flex gap-16">
+            <div class="mt-8 mb-5 py-3 border-t border-amber-700 flex gap-16">
                 <div class="space-y-2">
                     <h4 class="text-lg font-semibold">Billing and Delivery information</h4>
                     <dl>
@@ -34,9 +34,9 @@
                 </div>
             </div>
             <div class="mt-4">
-                <div class="border-y border-gray-200">
+                <div class="border-y border-amber-700">
                      <table class="w-full text-center">
-                        <tbody class="divide-y divide-gray-200">
+                        <tbody class="divide-y divide-amber-700">
                             @for (item of order.orderItems; track item.productId) {
                                 <tr>
                                     <td class="py-4">
@@ -53,7 +53,7 @@
                     </table>
                 </div>
             </div>
-            <div class="space-y-4 rounded-lg border border-gray-200 shadow-sm p-4">
+            <div class="space-y-4 rounded-lg border border-amber-700 shadow-sm p-4 mt-5">
                 <p class="text-xl font-semibold">Order Summary</p>
                 <div class="space-y-4">
                     <div class="space-y-2">
@@ -70,7 +70,7 @@
                             <dd class="font-medium ">{{order.shippingPrice | currency}}</dd>
                         </dl>
                     </div>
-                    <dl class="flex items-center justify-between gap-4 border-top border-gray-200 pt-2">
+                    <dl class="flex items-center justify-between gap-4 border-top border-amber-700 pt-2">
                         <dt class="font-medium ">Total</dt>
                         <dd class="font-medium">{{order.total | currency}}</dd>
                     </dl>

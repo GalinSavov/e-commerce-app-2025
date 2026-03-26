@@ -30,7 +30,26 @@ export class StripeService {
       const stripe = await this.getStripeInstance();
       if(stripe){
         const cart = await firstValueFrom(this.createOrUpdatePaymentIntent());
-        this.elements = stripe.elements({clientSecret:cart.clientSecret,appearance:{labels:'floating'}})
+        this.elements = stripe.elements({clientSecret:cart.clientSecret,appearance: {
+          theme: 'flat',
+          labels: 'floating',
+          variables: {
+            colorPrimary: '#b45309',
+            colorBackground: '#000000',
+            colorText: '#ffffff',
+            borderRadius: '12px'
+          },
+          rules: {
+        '.Tab': {
+          backgroundColor: '#0000ff'
+        },
+        '.Tab--selected': {
+          backgroundColor: '#ffff00'
+        }
+  }
+        },
+      
+      })
       }else{
         throw new Error('Stripe has not been loaded');
       }
@@ -41,7 +60,7 @@ export class StripeService {
     if(!this.paymentElement){
       const elements = await this.initializeElements();
       if(elements){
-        this.paymentElement = elements.create('payment');
+        this.paymentElement = elements.create('payment',{layout:'tabs'});
       }else{
         throw new Error('Elements instance has not been initialized');
       }
@@ -123,6 +142,7 @@ export class StripeService {
       );
   }
   disposeElements(){
+
     this.elements = undefined;
     this.addressElement = undefined;
     this.paymentElement = undefined;

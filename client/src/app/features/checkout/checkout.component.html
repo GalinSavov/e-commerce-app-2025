@@ -1,8 +1,10 @@
-<div class="flex mt-32 gap-6">
+<div class="flex mt-32 gap-10 mb-15">
      <div class="w-3/4">
-        <mat-stepper #stepper class=" border border-gray-200 shadow-sm" (selectionChange)="onStepChange($event)" [linear]="true">
+        <mat-stepper #stepper class=" border border-amber-700 shadow-sm" (selectionChange)="onStepChange($event)" [linear]="true">
             <mat-step label="Address" [completed]="completionStatus().address">
-                <div id="address-element"></div>
+                <div class="mt-4">
+                    <div id="address-element"></div>
+                </div>
                 <div class="flex justify-end mt-1">
                     <mat-checkbox (change)="onSaveAddressChange($event)" [checked]="saveAddress">
                         Save as Default Address
@@ -14,14 +16,16 @@
                 </div>
             </mat-step>
             <mat-step label="Shipping" [completed]="completionStatus().delivery">
-                <app-checkout-delivery (deliveryComplete)="handleDeliveryMethodChange($event)"></app-checkout-delivery>
+                <div class="mt-4">
+                    <app-checkout-delivery (deliveryComplete)="handleDeliveryMethodChange($event)"></app-checkout-delivery>
+                </div>
                 <div class="flex justify-between mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
                     <button [disabled]="!completionStatus().delivery" matStepperNext mat-flat-button>Next</button>
                 </div>
             </mat-step>
             <mat-step label="Payment" [completed]="completionStatus().card">
-                <div id="payment-element"></div>
+                <div class="bg-black" id="payment-element"></div>
                 <div class="flex justify-between mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
                     <button [disabled]="!completionStatus().card" matStepperNext mat-flat-button>Next</button>

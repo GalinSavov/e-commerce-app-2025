@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-4xl flex-1 space-y-6 w-full ">
-    <div class="space-y-4 rounded-lg border border-gray-200  shadow-sm p-4">
+    <div class="space-y-4 rounded-lg border border-amber-700  shadow-sm p-4">
         <p class="text-xl font-semibold">Order Summary</p>
         <div class="space-y-4">
             <div class="space-y-2">
@@ -28,7 +28,7 @@
             </div>
         }
     </div>
-    <div class="space-y-4 rounded-lg border border-gray-200  shadow-sm">
+    <div class="space-y-4 rounded-lg border border-amber-700  shadow-sm">
         <form class="space-y-2 flex flex-col p-2">
             <label class="mb-2 block text-sm font-medium ">
                 Do you have a voucher code?
@@ -37,8 +37,8 @@
                 <label class="text-green-500">{{this.cartService.shoppingCart()?.coupon?.name}} <mat-icon class="text-red-500 cursor-pointer" (click)="removeCouponCode()">close</mat-icon></label>
             }
             <mat-form-field appearance="outline">
-                <mat-label>Voucher Code</mat-label>
-                <input [disabled]="this.cartService.shoppingCart()?.coupon ? true : false" type="text" matInput [(ngModel)]="voucherCode" name="voucherCode">
+                <mat-label >Voucher Code</mat-label>
+                <input [disabled]="this.cartService.shoppingCart()?.coupon ? true : false" type="text" matInput [(ngModel)]="voucherCode " name="voucherCode">
             </mat-form-field>
             <button [disabled]="this.cartService.shoppingCart()?.coupon ? true : false" (click)="applyCouponCode()" mat-flat-button>Apply Code</button>
         </form>
